@@ -8,24 +8,32 @@
 typedef struct macro_t
 {
     char* val;
+    char* name;
     struct macro_t* next;
     struct macro_t* prev;
 } macro_t;
 
-void add_macro(char* val, macro_t* macro)
+void add_macro(char* name, char* val, macro_t* prev)
 {
-    macro->next = malloc(sizeof(macro_t));
+    prev->next = malloc(sizeof(macro_t));
+
+    size_t name_size = strlen(name);
+    prev->next->name = malloc(name_size * sizeof(char));
+    memcpy(prev->next->name, name, name_size);
+
     size_t val_size = strlen(val);
-    macro->next->val = malloc(val_size * sizeof(char));
-    memcpy(macro->next->val, val, val_size);
-    macro->next->prev = macro;
-    macro->next->next = NULL;
+    prev->next->val = malloc(val_size * sizeof(char));
+    memcpy(prev->next->val, val, val_size);
+
+    prev->next->prev = prev;
+    prev->next->next = NULL;
 }
 
 void delete_macro(macro_t* macro)
 {
     macro->prev->next = macro->next;
     free(macro->val);
+    free(macro->name);
     free(macro);
 }
 
