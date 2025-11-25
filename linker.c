@@ -37,19 +37,20 @@ void delete_macro(macro_t* macro)
     free(macro);
 }
 
+macro_t first;
 
 int main(int argc, char **argv)
 {
     if (argc <= 1)
     {
-        printf("%s\n", "too many arguments");
+        printf("%s\n", "not enough arguments");
         return 1;
     }
 
     size_t arg_len = strlen(argv[FIRST_ARGUMENT]);
     char *arg = malloc(arg_len * sizeof(char));
     
-    if (arg == nullptr)
+    if (arg == NULL)
     {
         printf("%s\n", "failed to allocate arg");
         return 1;
@@ -59,7 +60,7 @@ int main(int argc, char **argv)
 
     FILE* file, *temp;
 
-    file = fopen(arg, "r");
+    file = fopen(arg, "r+");
     temp = fopen(TEMP, "w");
 
     if (!file || !temp) 
@@ -71,7 +72,6 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    
     
     fclose(file);
     fclose(temp);
