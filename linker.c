@@ -132,6 +132,7 @@ int main(int argc, char **argv)
 
         printf("%s", "macro val: ");
         printf("%s\n", macro->val);
+        delete_macro(macro);
         macro = macro->next;
     }
     
