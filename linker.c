@@ -72,10 +72,72 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    char line[256];
+    unsigned int num_quotatation_mark = 0;
+    
+    macro_t *current_macro = &first;
+
+    while (fgets(line, sizeof(line), file))
+    {
+        char *c = line;
+        while(*c != '\0')
+        {
+            if(*c == '"')
+                ++num_quotatation_mark;
+            ++c;
+        }
+        
+        char* def_ptr = strstr(line, "#define");
+        if (def_ptr && num_quotatation_mark % 2 == 0)
+        { 
+            char* name_start = def_ptr + 8; // 8 is "#define" length
+
+            char *val_start = name_start;
+            while(*val_start != ' ')
+            {
+                ++val_start;
+                if(*val_start == '\0')
+                    goto invalid_macro;
+            }
+            *val_start = '\0';
+
+            ++val_start;
+
+            char *val_end = val_start;
+            while (*val_end != '\n')
+            {
+                ++val_end;
+                if(*val_end == '\0')
+                    break;
+            }
+            *val_end = '\0'; 
+
+            add_macro(name_start, val_start, current_macro);
+            current_macro = current_macro->next;
+        }
+        else 
+        {
+            // some replacing stuff...
+            fprintf(temp, "%s", line);
+        }
+        invalid_macro:
+    }
+
+    macro_t* macro = first.next;
+
+    while (macro != NULL)
+    {
+        printf("%s", "macro name: ");
+        printf("%s\n", macro->name);
+
+        printf("%s", "macro val: ");
+        printf("%s\n", macro->val);
+        macro = macro->next;
+    }
     
     fclose(file);
     fclose(temp);
-    remove(TEMP);
+    //remove(TEMP);
     free(arg);
     return 0;
 }
