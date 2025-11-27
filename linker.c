@@ -123,44 +123,41 @@ int main(int argc, char **argv)
             while (macro != NULL)
             {                
                 macro_start = strstr(line, macro->name);
-                if (macro_start != NULL)  break;
-             
+
+                if (macro_start != NULL)
+                {
+                    char old_line[256];
+                    memcpy(old_line, line, sizeof(line));
+
+                    char *c = macro_start;
+                    size_t len = strlen(macro->val);
+                    char *macro_end = macro_start + (len * sizeof(char)); 
+                    
+                    if (len + strlen(line) >= 256)
+                    {
+                        printf("%s\n", "err the string is too large > 255 characters");
+                        goto cleanup;
+                    }
+
+                    short i = 0;
+                    while(c != macro_end)
+                    {
+                        *c = macro->val[i++];
+                        ++c;
+                    }
+                    
+                    i = (macro_start - line) + strlen(macro->name);
+
+                    while(old_line[i] != '\0')
+                    {
+                        *(c++) = old_line[i++];
+                    }
+                    *c = '\0'; 
+                }
+                
+                macro_start = NULL;
                 macro = macro->next;
             }
-
-
-            if (macro_start != NULL)
-            {
-
-                char old_line[256];
-                memcpy(old_line, line, sizeof(line));
-
-                char *c = macro_start;
-                size_t len = strlen(macro->val);
-                char *macro_end = macro_start + (len * sizeof(char)); 
-                
-                if (len + strlen(line) >= 256)
-                {
-                    printf("%s\n", "err the string is too large > 255 characters");
-                    goto cleanup;
-                }
-
-                short i = 0;
-                while(c != macro_end)
-                {
-                    *c = macro->val[i++];
-                    ++c;
-                }
-                
-                i = (macro_start - line) + strlen(macro->name);
-
-                while(old_line[i] != '\0')
-                {
-                    *(c++) = old_line[i++];
-                }
-                *c = '\0'; 
-            }
-
 
             printf("%s", line);
             fprintf(temp, "%s", line);
@@ -184,7 +181,7 @@ int main(int argc, char **argv)
 cleanup:
     fclose(file);
     fclose(temp);
-    //remove(TEMP);
+    // remove(TEMP);
     free(arg);
     return 0;
 }
