@@ -67,8 +67,8 @@ int main(int argc, char **argv)
     {
         printf("%s\n", "failed to open file");
         free(arg);
-        if (file) fclose(file);
-        if (temp) fclose(temp); remove(TEMP);
+        if (file){ fclose(file); }
+        if (temp){ fclose(temp); remove(TEMP); }
         return 1;
     }
 
