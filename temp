@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define FIRST_ARGUMENT 1
-#define TEMP "temp"
 
 typedef struct macro_t
 {
@@ -47,7 +45,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    size_t arg_len = strlen(argv[FIRST_ARGUMENT]);
+    size_t arg_len = strlen(argv[1]);
     char *arg = malloc(arg_len * sizeof(char));
     
     if (arg == NULL)
@@ -56,19 +54,19 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    memcpy(arg, argv[FIRST_ARGUMENT], arg_len);
+    memcpy(arg, argv[1], arg_len);
 
     FILE* file, *temp;
 
     file = fopen(arg, "r+");
-    temp = fopen(TEMP, "w");
+    temp = fopen("temp", "w");
 
     if (!file || !temp) 
     {
         printf("%s\n", "failed to open file");
         free(arg);
         if (file){ fclose(file); }
-        if (temp){ fclose(temp); remove(TEMP); }
+        if (temp){ fclose(temp); remove("temp"); }
         return 1;
     }
 
@@ -182,7 +180,7 @@ int main(int argc, char **argv)
 cleanup:
     fclose(file);
     fclose(temp);
-    // remove(TEMP);
+    // remove("temp");
     free(arg);
     return 0;
 }
