@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -79,18 +80,37 @@ int main(int argc, char **argv)
 
     while (fgets(line, sizeof(line), file))
     {
-        char *c = line;
-        while(*c != '\0')
-        {
-            if(*c == '"')
-                ++num_quotatation_mark;
-            ++c;
-        }
         
         char* def_ptr = strstr(line, "#define");
+        char* undef_ptr = strstr(line, "#undef");
+
+        if (def_ptr)
+        {
+            char *c = line;
+            while (c != def_ptr)
+            {
+                if (*c == '"') 
+                    ++num_quotatation_mark;
+            
+                ++c;
+            }  
+        }
+
+        else if (undef_ptr)
+        {
+            char *c = line;
+            while (c != undef_ptr)
+            {
+                if (*c == '"') 
+                    ++num_quotatation_mark;
+            
+                ++c;
+            }  
+        }
+        
         if (def_ptr && num_quotatation_mark % 2 == 0)
         { 
-            char* name_start = def_ptr + 8; // 8 is "#define" length
+            char* name_start = def_ptr + 8; // 7 is "#define" length + 1 space
 
             char *val_start = name_start;
             while(*val_start != ' ')
@@ -115,6 +135,30 @@ int main(int argc, char **argv)
             add_macro(name_start, val_start, current_macro);
             current_macro = current_macro->next;
         }
+
+        else if (undef_ptr && num_quotatation_mark % 2 == 0)
+        {
+            char* name_start = undef_ptr + 7; // 6 is "#undef" length + 1 space
+            char* name_end = name_start;
+            while (*name_end != ' ' && *name_end != '\0')
+            {
+                ++name_end;
+            }
+            *--name_end = '\0';
+
+            macro_t* macro = first.next;
+
+            while (macro != NULL)
+            {
+                if (strcmp(macro->name, name_start) == 0)
+                {
+                    delete_macro(macro);
+                    break;
+                }
+                macro = macro->next;                
+            }
+        }
+        
         else 
         {
             char* macro_start = NULL;
@@ -168,6 +212,7 @@ int main(int argc, char **argv)
 
     macro_t* macro = first.next;
 
+    printf("\n");
     while (macro != NULL)
     {
         printf("%s", "macro name: ");
